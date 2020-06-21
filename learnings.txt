@@ -1,0 +1,79 @@
+Project Structuring:
+
+> Trying to structure the project as a professional machine learning project, as described by Abhishek Thakur in his youtube series on Applied Machine Learning.
+
+> I am using dispatcher files, and shell scripts to run the models, which particularly make it quite easy to run multiple models etc.
+
+> I am also writing the aggregated scores in notepad files so that it is easy to track the models accuracies and scores.
+
+> This helps a lot if you are running various models and training on it.
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+
+Attempt #1:
+
+
+Step1:
+
+> Performed Basic EDA on the data, most of the variables are quite well behaved and have (nearly the same) distribution in the training and the test data
+
+> However, there are some variables like X_11 which have missing values, and at times a little different distribution.
+
+> Another observation that I made is that there are some entries in test data which are not present in the training data, so what I did was that I concatenated all the training and testing data together and then I labelencoded them together, and then again split them in respective training and testing data
+
+Step2:
+
+> I had done a 10 fold cross validation scheme for this data
+
+> As all the datapoints are typically categorical (it looks like that at least) therefore, we will have to pay attention to it carefully. 
+
+> Then for training, I used scikit-learn to call the differnet classification models, like logistic regression, RandomForests etc.
+
+Step3:
+
+> Something looked fishy in the way our models made prediction, on the validation data (validation splits that I made) I was getting 1.0 Recall score, when I heavily peanalized the variables 
+
+> Also, when I made predictions it was classifying all the data points as 1.0 ie. an attack took place which seemed fishy in itslef. Therefore, we will have to do something special to handle this use case
+
+> The model which performed the best was logistic regression with C=1-6 which was very heavy regularization, therefore, it would definitely marginalize most of the features and choose only top 3-4 features as the most important factor while making predictions.
+
+> Interpretability : From the feature importance schema, it is quite visible that we were paying overly high importance to X_10, X_12, and X_1 a lot of importance to the extent that other features have little to no impact on the decision making. Now, in linear models like logistic regression, this kind of attributes are common. However we would typically not want that.
+
+----------------------------
+
+TAKEAWAYS:
+
+> reduce the k-fold splits to 5 fold from 10 fold (as 10 fold seems like an overkill for such a small dataset, in that case validation batches become way too small)
+
+> One thing that I did not actually take into consideration was the class imbalance therefore, Use imblearn for oversampling techniques, as all the variables are categorical, the techniques like SMOTE cannot be used, therefore, we will use Random_Oversampling
+
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+
+Attempt #2:
+
+> Using 5-Fold cross validation now, and using imblearn Random_Oversampling
+
+Observations:
+
+> So immediately we can see some effect that the oversampling has had on the dataset. The first thing being that the models like logistic regression are no longer giving out ridiculous recall score of 1.0 anymore. Therefore, something looks correct as of now.
+
+> Therefore, all the models that we defined in the previous case are actually not doing that well right now, therefore we will have to look into other kind of techniques.
+
+> to try out decision trees, I used sklearn.tree and surprisingly it is giving out really good results. Therefore, I am a little curious and to my surprise the feature importance list has changes and suddenly X_10 is the most desired variable which is involved in the decision making process.
+
+> Also, when I predict on the testing data and this time there were some entries that we classified as '0' class, which is quite good. Therefore, it definitely helped.
+
